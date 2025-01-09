@@ -14,15 +14,22 @@ class Tree {
 }
 
 function buildTree(array) {
-  // Take an array
-  // Sort Array && Remove Duplicates
-  // Sort with Recursive Function?
+
 }
 
 
 function merge(leftArr, rightArr) {
   const sortedArr = [];
+
   while (leftArr.length && rightArr.length) {
+    if (sortedArr.includes(leftArr[0])) {
+      leftArr.shift();
+    }
+
+    if (sortedArr.includes(rightArr[0])) {
+      rightArr.shift();
+    }
+
     if (leftArr[0] < rightArr[0]) {
       sortedArr.push(leftArr.shift());
     } else {
@@ -44,12 +51,10 @@ function mergeSort(arr) {
   const leftArr = arr.slice(0, mid);
   const rightArr = arr.slice(mid);
 
-  // console.log(left, right);
-
   return merge(mergeSort(leftArr), mergeSort(rightArr));
 }
 
 
-const array = [1, 4, 3, 8, 2, 5, 7, 6];
+const array = [1, 3, 4, 2, 8, 5, 7, 6];
 const example = mergeSort(array);
 console.log(example);
