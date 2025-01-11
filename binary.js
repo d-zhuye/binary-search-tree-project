@@ -7,11 +7,31 @@ class Node {
 }
 
 class Tree {
-  constructor(array, root = null) {
+  constructor(array) {
     this.array = array;
     this.sorted = mergeSort(array);
     this.root = buildTree(this.sorted);
   }
+
+
+  insert(value, root = this.root) {
+    if (value == root.data) return null;
+
+    if (value < root.data && !root.left) {
+      root.left = new Node(value);
+    } else if (value > root.data && !root.right) {
+      root.right = new Node(value);
+    }
+
+    if (value < root.data) {
+      root = root.left;
+    } else {
+      root = root.right;
+    }
+
+    return this.insert(value, root);
+  }
+
 }
 
 function merge(leftArr, rightArr) {
@@ -21,7 +41,7 @@ function merge(leftArr, rightArr) {
     if (sortedArr.includes(leftArr[0])) {
       leftArr.shift();
     }
-  
+
     if (sortedArr.includes(rightArr[0])) {
       rightArr.shift();
     }
@@ -36,7 +56,6 @@ function merge(leftArr, rightArr) {
   return [...sortedArr, ...leftArr, ...rightArr];
 }
 
-
 function mergeSort(arr) {
   if (arr.length < 2) {
     return arr;
@@ -50,33 +69,29 @@ function mergeSort(arr) {
   return merge(mergeSort(leftArr), mergeSort(rightArr));
 }
 
-
 function buildTree(arr) {
-  // console.log(arr);
-  if (arr.length <= 1) {
-    return arr[0];
+  if (arr.length == 1) {
+    return new Node(arr[0]);
   }
 
-  const mid = Math.floor(arr.length / 2);
-  // console.log(mid);
+  if (arr.length == 0) {
+    return null;
+  }
+
+  const mid = Math.floor((arr.length - 1) / 2);
 
   const root = new Node(arr[mid]);
- // console.log(root);
 
-  const leftArray = arr.slice(0, mid);
-  root.left = buildTree(leftArray);
-  // console.log(leftArray);
+  const leftArr = arr.slice(0, mid);
+  root.left = buildTree(leftArr);
 
   const rightArr = arr.slice(mid + 1, arr.length);
   root.right = buildTree(rightArr);
-  // console.log(rightArr);
-
 
   return root;
 }
 
-
 const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const binaryTree = new Tree(array);
-
-console.log(binaryTree.BST);
+binaryTree.insert(636);
+console.dir(binaryTree.root, {depth: 8, colors: true});
