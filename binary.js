@@ -9,8 +9,7 @@ class Node {
 class Tree {
   constructor(array) {
     this.array = array;
-    this.sorted = mergeSort(array);
-    this.root = buildTree(this.sorted);
+    this.root = buildTree(mergeSort(this.array));
   }
 
   insert(value, root = this.root) {
@@ -31,14 +30,6 @@ class Tree {
     return this.insert(value, root);
   }
 
-  // Take in a value for deletion
-  // Start at root node and traverse down binary tree
-  // If value is less than node data, then move left, else if greater, move right
-  // If value is equal to node data, return node
-  // If returned node does not have any children, set respective branch of parent node to null
-  // Evaluate if located node has left, right, or both children
-  // Compare values, choose the right child (greater value) for succession
-
   delete(value, root = this.root) {
     if (root == null) {
       console.log(`No node with ${value} found.`);
@@ -56,10 +47,6 @@ class Tree {
         return root.left;
       }
 
-      // Inorder Successor (Right Subtree Minimum)
-      // Traverse as left as possible along the RIGHT subtree of the current node
-      // This preserves BST as it is always greater than the current node, but smaller than other nodes in right
-
       let curr = root.right;
       while (curr.left && curr.right) {
         curr = curr.left;
@@ -72,13 +59,6 @@ class Tree {
     return root;
   }
 
-  // Begin at root node
-  // Compare value against root data
-  // If value is less than, traverse left
-  // If value is greater than, traverse right
-  // Repeat previous step until value equals node data, or node data equals null (base case)
-  // Print && return Node if match
-
   find(value, root = this.root) {
     if (root == null) {
       console.log(`${value} not found in tree.`);
@@ -90,8 +70,6 @@ class Tree {
     } else if (value > root.data) {
       root = root.right;
     } else {
-      console.log("Node Found!");
-      console.log(root);
       return root;
     }
 
@@ -118,6 +96,7 @@ class Tree {
 
       callback(array[i]);
     }
+    return array;
   }
 
   inOrder(callback, root = this.root) {
@@ -160,6 +139,66 @@ class Tree {
     this.postOrder(callback, root.left);
     this.postOrder(callback, root.right);
     callback(root.data);
+  }
+
+  height(value, root = this.find(value)) {
+    if (!root) return -1;
+
+    let leftHeight = this.height(value, root.left);
+    let rightHeight = this.height(value, root.right);
+    return 1 + Math.max(leftHeight, rightHeight);
+  }
+
+  depth(value, root = this.root, depth = 0) {
+    if (!root) {
+      return;
+    }
+
+    if (value < root.data) {
+      root = this.depth(value, root.left, depth + 1);
+    } else if (value > root.data) {
+      root = this.depth(value, root.right, depth + 1);
+    } else {
+      return depth;
+    }
+
+    return root;
+  }
+
+  isBalanced() {
+    let isBalanced = true;
+    let leftSubtreeHeight = 0;
+    let rightSubtreeHeight = 0;
+    this.levelOrder((node) => {
+      if (node.left) {
+        leftSubtreeHeight = this.height(node.left.data);
+      } else {
+        leftSubtreeHeight = 0;
+      }
+
+      if (node.right) {
+        rightSubtreeHeight = this.height(node.right.data);
+      } else {
+        rightSubtreeHeight = 0;
+      }
+
+      const diffHeight = Math.abs(leftSubtreeHeight - rightSubtreeHeight);
+      if (diffHeight > 1) {
+        isBalanced = false;
+      }
+    });
+
+    return isBalanced;
+  }
+
+  rebalance() {
+    const array = [];
+    this.levelOrder(node => {
+      array.push(node.data);
+    })
+    
+    this.root = buildTree(mergeSort(array));
+    console.dir(this.root, {depth: 8});
   }
 }
 
@@ -222,7 +261,3 @@ function buildTree(arr) {
 
 const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const binaryTree = new Tree(array);
-
-binaryTree.postOrder((value) => {
-  console.log(value);
-});
