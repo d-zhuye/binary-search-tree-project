@@ -13,7 +13,6 @@ class Tree {
     this.root = buildTree(this.sorted);
   }
 
-
   insert(value, root = this.root) {
     if (value == root.data) return null;
 
@@ -32,6 +31,136 @@ class Tree {
     return this.insert(value, root);
   }
 
+  // Take in a value for deletion
+  // Start at root node and traverse down binary tree
+  // If value is less than node data, then move left, else if greater, move right
+  // If value is equal to node data, return node
+  // If returned node does not have any children, set respective branch of parent node to null
+  // Evaluate if located node has left, right, or both children
+  // Compare values, choose the right child (greater value) for succession
+
+  delete(value, root = this.root) {
+    if (root == null) {
+      console.log(`No node with ${value} found.`);
+      return root;
+    }
+
+    if (value < root.data) {
+      root.left = this.delete(value, root.left);
+    } else if (value > root.data) {
+      root.right = this.delete(value, root.right);
+    } else {
+      if (!root.left) {
+        return root.right;
+      } else if (!root.right) {
+        return root.left;
+      }
+
+      // Inorder Successor (Right Subtree Minimum)
+      // Traverse as left as possible along the RIGHT subtree of the current node
+      // This preserves BST as it is always greater than the current node, but smaller than other nodes in right
+
+      let curr = root.right;
+      while (curr.left && curr.right) {
+        curr = curr.left;
+      }
+
+      root.data = curr.data;
+      root.right = this.delete(curr.data, root.right);
+    }
+
+    return root;
+  }
+
+  // Begin at root node
+  // Compare value against root data
+  // If value is less than, traverse left
+  // If value is greater than, traverse right
+  // Repeat previous step until value equals node data, or node data equals null (base case)
+  // Print && return Node if match
+
+  find(value, root = this.root) {
+    if (root == null) {
+      console.log(`${value} not found in tree.`);
+      return;
+    }
+
+    if (value < root.data) {
+      root = root.left;
+    } else if (value > root.data) {
+      root = root.right;
+    } else {
+      console.log("Node Found!");
+      console.log(root);
+      return root;
+    }
+
+    return this.find(value, root);
+  }
+
+  levelOrder(callback) {
+    if (!callback && typeof callback !== "function") {
+      throw new Error("Please provide a valid callback function.");
+    }
+
+    let array = [];
+
+    array.push(this.root);
+
+    for (let i = 0; i < array.length; i++) {
+      if (array[i].left) {
+        array.push(array[i].left);
+      }
+
+      if (array[i].right) {
+        array.push(array[i].right);
+      }
+
+      callback(array[i]);
+    }
+  }
+
+  inOrder(callback, root = this.root) {
+    if (!callback && typeof callback !== "function") {
+      throw new Error("Please provide a valid callback function.");
+    }
+
+    if (!root) {
+      return;
+    }
+
+    this.inOrder(callback, root.left, array);
+    callback(root.data);
+    this.inOrder(callback, root.right, array);
+  }
+
+  preOrder(callback, root = this.root) {
+    if (!callback && typeof callback !== "function") {
+      throw new Error("Please provide a valid callback function.");
+    }
+
+    if (!root) {
+      return;
+    }
+
+    callback(root.data);
+    this.preOrder(callback, root.left);
+    this.preOrder(callback, root.right);
+  }
+
+  postOrder(callback, root = this.root) {
+    if (!callback && typeof callback !== "function") {
+      throw new Error("Please provide a valid callback function.");
+    }
+
+    if (!root) {
+      return;
+    }
+
+    this.postOrder(callback, root.left);
+    this.postOrder(callback, root.right);
+    callback(root.data);
+  }
 }
 
 function merge(leftArr, rightArr) {
@@ -93,5 +222,7 @@ function buildTree(arr) {
 
 const array = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
 const binaryTree = new Tree(array);
-binaryTree.insert(636);
-console.dir(binaryTree.root, {depth: 8, colors: true});
+
+binaryTree.postOrder((value) => {
+  console.log(value);
+});
